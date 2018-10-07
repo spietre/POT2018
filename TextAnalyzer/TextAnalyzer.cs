@@ -234,7 +234,7 @@ namespace TextAnalyzer
             orderedList.Sort(CharFreqComparer);
 
             // writing to stdout
-            Console.WriteLine("Character frequencies: ");
+            Console.WriteLine("\nCharacter frequencies: ");
             foreach (KeyValuePair<char, int> pair in orderedList)
             {
                 Console.WriteLine(pair.Key + ": " + pair.Value + "x");
@@ -269,6 +269,23 @@ namespace TextAnalyzer
             return 0;
         }
 
+        // Help function
+        private static int WordFreqComparer (KeyValuePair<string, int> one, KeyValuePair<string, int> two)
+        {
+            // at first order by values
+            if (one.Value > two.Value)
+            {
+                return -1;
+            }
+
+            if (one.Value < two.Value)
+            {
+                return 1;
+            }
+
+            return 0;
+        }
+
         public void WordFreq ()
         {
             if (!isWF || text.Length == 0) 
@@ -276,17 +293,32 @@ namespace TextAnalyzer
                 return;
             }
 
-            string[] sentenceList = text.Replace ("?", ".").Replace ("!", ".").Split ('.');
+            string[] wordList = text.ToLower ().Replace (",", "").Replace (".", "").Replace ("!", "").Replace ("?", "")
+                .Split (' ');
+            
+            Dictionary<string, int> worDictionary = new Dictionary<string, int>();
 
-            if (sentenceList[sentenceList.Length - 1].Length == 0)
+            for (int i = 0; i < wordList.Length; i++)
             {
-                aSentenceCount = sentenceList.Length - 1;
-            }
-            else
-            {
-                aSentenceCount = sentenceList.Length;
+                try
+                {
+                    worDictionary.Add(wordList[i], 1);
+                }
+                catch (ArgumentException e)
+                {
+                    worDictionary[wordList[i]] += 1;
+                }
             }
 
+            List<KeyValuePair<string, int>> sortedList = worDictionary.ToList();
+            sortedList.Sort (WordFreqComparer);
+
+            // writing to stdout
+            Console.WriteLine ("\nWord frequencies: ");
+            foreach (KeyValuePair<string, int> pair in sortedList)
+            {
+                Console.WriteLine (pair.Key + ": " + pair.Value + "x");
+            }
         }
 
         static void Main(string[] args)
@@ -315,6 +347,7 @@ namespace TextAnalyzer
             Console.WriteLine("Average sentence length (words):\t" + analyzer.AvgWordCount());
 
             analyzer.CharFreq();
+            analyzer.WordFreq ();
 
 
             Console.WriteLine("Press Enter To Exit...");
