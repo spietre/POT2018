@@ -6,26 +6,26 @@ namespace TextAnalyzer
 {
     class TextAnalyzer
     {
-        private bool isCF;
-        private bool isWF;
-        private string text;
-        private int aCharCount; //characters count without whitespaces
-        private int aCharCountWhite; //characters count with whitespaces
-        private int aVowelCount; //number of vowels
-        private int aConsonCount;
-        private int aWordCount;
-        private int aUniqueWordsCount;
-        private int aSentenceCount;
+        private bool _isCF;
+        private bool _isWF;
+        private string _text;
+        private int _charCount; //characters count without whitespaces
+        private int _charCountWhite; //characters count with whitespaces
+        private int _vowelCount; //number of vowels
+        private int _consonCount;
+        private int _wordCount;
+        private int _uniqueWordsCount;
+        private int _sentenceCount;
 
         TextAnalyzer(string[] input)
         {
-            isCF = false;
-            isWF = false;
-            aCharCount = 0;
-            aCharCountWhite = 0;
-            aVowelCount = 0;
-            aConsonCount = 0;
-            text = "";
+            _isCF = false;
+            _isWF = false;
+            _charCount = 0;
+            _charCountWhite = 0;
+            _vowelCount = 0;
+            _consonCount = 0;
+            _text = "";
 
             for (int i = 0; i < input.Length; i++)
             {
@@ -34,28 +34,29 @@ namespace TextAnalyzer
                     switch (input[i].ToLower())
                     {
                         case "-cf":
-                            this.isCF = true;
+                            this._isCF = true;
                             break;
                         case "-wf":
-                            this.isWF = true;
+                            this._isWF = true;
                             break;
                     }
                 }
                 else
                 {
-                    if (text.Length == 0)
+                    if (_text.Length == 0)
                     {
-                        text = input[i];
+                        _text = input[i];
                     }
                 }
             }
         }
 
+        // writes out status
         public void GetStatus()
         {
-            Console.WriteLine("isCF: " + isCF);
-            Console.WriteLine("isWF: " + isWF);
-            Console.WriteLine("Text: " + text);
+            Console.WriteLine("isCF: " + _isCF);
+            Console.WriteLine("isWF: " + _isWF);
+            Console.WriteLine("Text: " + _text);
         }
 
         public void analyze()
@@ -67,9 +68,9 @@ namespace TextAnalyzer
          */
         public int Length()
         {
-            this.aCharCountWhite = text.Length;
+            _charCountWhite = _text.Length;
 
-            return aCharCountWhite;
+            return _charCountWhite;
         }
 
         /**
@@ -77,40 +78,54 @@ namespace TextAnalyzer
         */
         public int LenghtNotWhite()
         {
-            this.aCharCount = text.Replace(" ", "").Length;
+            _charCount = _text.Replace(" ", "").Length;
 
-            return aCharCount;
+            return _charCount;
         }
 
+        // returns number of vowels
         public int VowelCount()
         {
-            aVowelCount = 0;
-            string lowerText = text.ToLower();
+            _vowelCount = 0;
+            string lowerText = _text.ToLower();
 
-            foreach (char c in lowerText)
+            for (int i = 0; i < lowerText.Length; i++)
             {
-                switch (c)
+                switch (lowerText[i])
                 {
                     case 'a':
                     case 'e':
-                    case 'i':
                     case 'o':
                     case 'u':
                     case 'y':
-                        aVowelCount++;
+                    case 'ô':
+                        _vowelCount++;
+                        break;
+                    case 'i':
+                        _vowelCount++;
+                        switch (lowerText[i + 1])
+                        {
+                            case 'a':
+                            case 'e':
+                            case 'u':
+                                i++;
+                                break;
+                        }
+
                         break;
                     default:
                         continue;
                 }
             }
 
-            return aVowelCount;
+            return _vowelCount;
         }
 
+        // returns number of consonants
         public int ConsonantCount()
         {
-            aConsonCount = 0;
-            string lowerText = text.ToLower();
+            _consonCount = 0;
+            string lowerText = _text.ToLower();
 
             foreach (char c in lowerText)
             {
@@ -124,39 +139,40 @@ namespace TextAnalyzer
                     case 'o':
                     case 'u':
                     case 'y':
+                    case 'ô':
                         continue;
                     default:
-                        aConsonCount++;
+                        _consonCount++;
                         break;
                 }
             }
 
-            return aConsonCount;
+            return _consonCount;
         }
 
+        // returns number of words
         public int WordCount()
         {
-            if (text.Length == 0)
+            if (_text.Length == 0)
             {
-                return aWordCount;
+                return _wordCount;
             }
 
-            string[] wordList = text.ToLower().Replace(",", "").Replace(".", "").Replace("!", "").Replace("?", "")
-                .Split(' ');
-            aWordCount = wordList.Length;
+            string[] wordList = _text.ToLower().Split(new [] {' ', ',', '.', '?', '!'}, StringSplitOptions.RemoveEmptyEntries);
+            _wordCount = wordList.Length;
 
-            return aWordCount;
+            return _wordCount;
         }
 
+        // returns number of unique words
         public int UniqueWordsCount()
         {
-            if (text.Length == 0)
+            if (_text.Length == 0)
             {
-                return aWordCount;
+                return _wordCount;
             }
 
-            string[] wordList = text.ToLower().Replace(",", "").Replace(".", "").Replace("!", "").Replace("?", "")
-                .Split(' ');
+            string[] wordList = _text.ToLower().Split (new[] { ' ', ',', '.', '?', '!' }, StringSplitOptions.RemoveEmptyEntries);
             HashSet<string> uniqueWordSet = new HashSet<string>();
 
             for (int i = 0; i < wordList.Length; i++)
@@ -164,55 +180,57 @@ namespace TextAnalyzer
                 uniqueWordSet.Add(wordList[i]);
             }
 
-            aUniqueWordsCount = uniqueWordSet.Count;
+            _uniqueWordsCount = uniqueWordSet.Count;
 
-            return aUniqueWordsCount;
+            return _uniqueWordsCount;
         }
 
+        // returns number of sentences
         public int SentenceCount()
         {
-            if (text.Length == 0)
+            if (_text.Length == 0)
             {
-                return aWordCount;
+                return _wordCount;
             }
 
-            string[] sentenceList = text.Replace("?", ".").Replace("!", ".").Split('.');
+            string[] sentenceList = _text.Split(new [] {'.', '!', '?'});
 
             if (sentenceList[sentenceList.Length - 1].Length == 0)
             {
-                aSentenceCount = sentenceList.Length - 1;
+                _sentenceCount = sentenceList.Length - 1;
             }
             else
             {
-                aSentenceCount = sentenceList.Length;
+                _sentenceCount = sentenceList.Length;
             }
 
-            return aSentenceCount;
+            return _sentenceCount;
         }
 
+        // returns average number of words in one sentence
         public double AvgWordCount()
         {
-            if (aSentenceCount == 0)
+            if (_sentenceCount == 0)
             {
                 return 0;
             }
 
-            double avgWrdCnt = (double) aWordCount / (double) aSentenceCount;
+            double avgWrdCnt = (double) _wordCount / (double) _sentenceCount;
 
             return Math.Round(avgWrdCnt, 2);
         }
 
-        // Calculates frequency of characters in given text string
+        // Calculates frequency of characters in the given text string
         public void CharFreq()
         {
-            if (!isCF || text.Length == 0)
+            if (!_isCF || _text.Length == 0)
             {
                 return;
             }
 
             Dictionary<char, int> charFreqDictionary = new Dictionary<char, int>();
 
-            foreach (char c in text.ToLower())
+            foreach (char c in _text.ToLower())
             {
                 if (c > 'z' || c < 'a')
                 {
@@ -220,14 +238,8 @@ namespace TextAnalyzer
                     continue;
                 }
 
-                try
-                {
-                    charFreqDictionary.Add(c, 1);
-                }
-                catch (ArgumentException e)
-                {
-                    charFreqDictionary[c] += 1;
-                }
+                charFreqDictionary.TryGetValue(c, out int frequency);
+                charFreqDictionary[c] = ++frequency;
             }
 
             List<KeyValuePair<char, int>> orderedList = charFreqDictionary.ToList();
@@ -288,26 +300,21 @@ namespace TextAnalyzer
 
         public void WordFreq ()
         {
-            if (!isWF || text.Length == 0) 
+            if (!_isWF || _text.Length == 0) 
             {
                 return;
             }
 
-            string[] wordList = text.ToLower ().Replace (",", "").Replace (".", "").Replace ("!", "").Replace ("?", "")
-                .Split (' ');
-            
+            string[] wordList = _text.ToLower().Split(new[] {' ', '!', '?', '.', ','}, StringSplitOptions.RemoveEmptyEntries);
+            //Replace(",", "").Replace(".", "").Replace("!", "").Replace("?", "")
+            //.Split (' ', '!', '?');
+
             Dictionary<string, int> worDictionary = new Dictionary<string, int>();
 
             for (int i = 0; i < wordList.Length; i++)
             {
-                try
-                {
-                    worDictionary.Add(wordList[i], 1);
-                }
-                catch (ArgumentException e)
-                {
-                    worDictionary[wordList[i]] += 1;
-                }
+                    worDictionary.TryGetValue(wordList[i], out int frequency);
+                    worDictionary[wordList[i]] = ++frequency;
             }
 
             List<KeyValuePair<string, int>> sortedList = worDictionary.ToList();
@@ -335,8 +342,10 @@ namespace TextAnalyzer
 
 
             TextAnalyzer analyzer = new TextAnalyzer(args);
-            analyzer.GetStatus();
 
+#if DEBUG
+            analyzer.GetStatus();
+#endif
             Console.WriteLine("Number of characters (with spaces):\t" + analyzer.Length());
             Console.WriteLine("Number of characters (no spaces):\t" + analyzer.LenghtNotWhite());
             Console.WriteLine("Number of vowels:\t\t\t" + analyzer.VowelCount());
